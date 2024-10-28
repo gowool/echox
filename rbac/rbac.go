@@ -76,8 +76,6 @@ func (rbac *RBAC) AddRole(role any, parents ...any) error {
 		r = NewRole(role)
 	case Role:
 		r = role
-	case *DefaultRole:
-		r = role
 	case DefaultRole:
 		r = &role
 	default:
