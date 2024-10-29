@@ -21,6 +21,7 @@ func AsHandler(f any) any {
 
 type APIHandler interface {
 	Area() string
+	Version() string
 	Register(*echo.Echo, huma.API)
 }
 

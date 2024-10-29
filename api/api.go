@@ -10,6 +10,11 @@ import (
 
 type ErrorTransformerFunc func(context.Context, error) error
 
+type CRUDInfo struct {
+	Area    string
+	Version string
+}
+
 type CRUD[
 	CB interface {
 		Decode(context.Context, *M) error
@@ -20,7 +25,7 @@ type CRUD[
 	M interface{ GetID() ID },
 	ID any,
 ] struct {
-	Name string
+	Info CRUDInfo
 	List[M]
 	Read[M, ID]
 	Create[CB, M, ID]
@@ -30,7 +35,11 @@ type CRUD[
 }
 
 func (h CRUD[CB, UB, M, ID]) Area() string {
-	return h.Name
+	return h.Info.Area
+}
+
+func (h CRUD[CB, UB, M, ID]) Version() string {
+	return h.Info.Version
 }
 
 func (h CRUD[CB, UB, M, ID]) Register(e *echo.Echo, api huma.API) {

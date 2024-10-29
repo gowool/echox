@@ -68,8 +68,9 @@ func NewEcho(params EchoParams) *echo.Echo {
 	}
 
 	apiHandlers := make(map[string][]APIHandler)
-	for _, handler := range params.APIHandlers {
-		apiHandlers[handler.Area()] = append(apiHandlers[handler.Area()], handler)
+	for _, apiHandler := range params.APIHandlers {
+		key := fmt.Sprintf("%s-%s", apiHandler.Area(), apiHandler.Version())
+		apiHandlers[key] = append(apiHandlers[key], apiHandler)
 	}
 
 	for _, name := range params.Config.Middlewares.Router.Before {
@@ -109,7 +110,7 @@ func NewEcho(params EchoParams) *echo.Echo {
 			continue
 		}
 
-		for key, cfgAPI := range cfg.API {
+		for version, cfgAPI := range cfg.API {
 			if !cfgAPI.Enabled {
 				continue
 			}
@@ -131,7 +132,7 @@ func NewEcho(params EchoParams) *echo.Echo {
 				}
 			}
 
-			for _, h := range apiHandlers[fmt.Sprintf("%s-%s", area, key)] {
+			for _, h := range apiHandlers[fmt.Sprintf("%s-%s", area, version)] {
 				h.Register(e, api)
 			}
 		}
