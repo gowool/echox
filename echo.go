@@ -17,7 +17,8 @@ import (
 type areaKey struct{}
 
 func CtxArea(ctx context.Context) string {
-	return ctx.Value(areaKey{}).(string)
+	area, _ := ctx.Value(areaKey{}).(string)
+	return area
 }
 
 type EchoParams struct {
