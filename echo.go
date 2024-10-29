@@ -109,6 +109,10 @@ func NewEcho(params EchoParams) *echo.Echo {
 		}
 
 		for key, cfgAPI := range cfg.API {
+			if !cfgAPI.Enabled {
+				continue
+			}
+
 			humaConfig := huma.DefaultConfig("", "")
 			humaConfig.Servers = []*huma.Server{{URL: cfg.Path + cfgAPI.Path}}
 			humaConfig.DocsPath = cfgAPI.DocsPath
