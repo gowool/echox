@@ -12,9 +12,9 @@ type AccessConfig struct {
 }
 
 type Config struct {
-	CreateMissingRoles bool           `json:"create_missing_roles,omitempty" yaml:"create_missing_roles,omitempty"`
-	RoleHierarchy      []RoleConfig   `json:"role_hierarchy,omitempty" yaml:"role_hierarchy,omitempty"`
-	AccessControl      []AccessConfig `json:"access_control,omitempty" yaml:"access_control,omitempty"`
+	CreateMissingRoles bool           `json:"createMissingRoles,omitempty" yaml:"createMissingRoles,omitempty"`
+	RoleHierarchy      []RoleConfig   `json:"roleHierarchy,omitempty" yaml:"roleHierarchy,omitempty"`
+	AccessControl      []AccessConfig `json:"accessControl,omitempty" yaml:"accessControl,omitempty"`
 }
 
 func NewWithConfig(cfg Config) (*RBAC, error) {

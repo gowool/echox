@@ -20,7 +20,7 @@ type MiddlewaresConfig struct {
 		After  []string `json:"after,omitempty" yaml:"after,omitempty"`
 	} `json:"router,omitempty" yaml:"router,omitempty"`
 	Recover   RecoverConfig       `json:"recover,omitempty" yaml:"recover,omitempty"`
-	BodyLimit BodyLimitConfig     `json:"body_limit,omitempty" yaml:"body_limit,omitempty"`
+	BodyLimit BodyLimitConfig     `json:"bodyLimit,omitempty" yaml:"bodyLimit,omitempty"`
 	Compress  GzipConfig          `json:"compress,omitempty" yaml:"compress,omitempty"`
 	Secure    SecureConfig        `json:"secure,omitempty" yaml:"secure,omitempty"`
 	CORS      CORSConfig          `json:"cors,omitempty" yaml:"cors,omitempty"`
@@ -38,9 +38,9 @@ func (cfg *MiddlewaresConfig) InitDefaults() {
 type APIConfig struct {
 	Enabled     bool            `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 	Path        string          `json:"path,omitempty" yaml:"path,omitempty"`
-	OpenAPIPath string          `json:"openapi_path,omitempty" yaml:"openapi_path,omitempty"`
-	DocsPath    string          `json:"docs_path,omitempty" yaml:"docs_path,omitempty"`
-	SchemasPath string          `json:"schemas_path,omitempty" yaml:"schemas_path,omitempty"`
+	OpenAPIPath string          `json:"openAPIPath,omitempty" yaml:"openAPIPath,omitempty"`
+	DocsPath    string          `json:"docsPath,omitempty" yaml:"docsPath,omitempty"`
+	SchemasPath string          `json:"schemasPath,omitempty" yaml:"schemasPath,omitempty"`
 	Middlewares []string        `json:"middlewares,omitempty" yaml:"middlewares,omitempty"`
 	Info        huma.Info       `json:"info,omitempty" yaml:"info,omitempty"`
 	Components  huma.Components `json:"components,omitempty" yaml:"components,omitempty"`
@@ -116,18 +116,18 @@ func (s SameSiteType) HTTP() http.SameSite {
 
 type SessionConfig struct {
 	Skipper         middleware.Skipper `json:"-" yaml:"-"`
-	CleanupInterval time.Duration      `json:"cleanup_interval" yaml:"cleanup_interval"`
-	IdleTimeout     time.Duration      `json:"idle_timeout" yaml:"idle_timeout"`
-	Lifetime        time.Duration      `json:"lifetime" yaml:"lifetime"`
+	CleanupInterval time.Duration      `json:"cleanupInterval,omitempty" yaml:"cleanupInterval,omitempty"`
+	IdleTimeout     time.Duration      `json:"idleTimeout,omitempty" yaml:"idleTimeout,omitempty"`
+	Lifetime        time.Duration      `json:"lifetime,omitempty" yaml:"lifetime,omitempty"`
 	Cookie          struct {
-		Name     string       `json:"name" yaml:"name"`
-		Domain   string       `json:"domain" yaml:"domain"`
-		Path     string       `json:"path" yaml:"path"`
-		Persist  bool         `json:"persist" yaml:"persist"`
-		Secure   bool         `json:"secure" yaml:"secure"`
-		HTTPOnly bool         `json:"http_only" yaml:"http_only"`
-		SameSite SameSiteType `json:"same_site" yaml:"same_site"`
-	} `json:"cookie" yaml:"cookie"`
+		Name     string       `json:"name,omitempty" yaml:"name,omitempty"`
+		Domain   string       `json:"domain,omitempty" yaml:"domain,omitempty"`
+		Path     string       `json:"path,omitempty" yaml:"path,omitempty"`
+		Persist  bool         `json:"persist,omitempty" yaml:"persist,omitempty"`
+		Secure   bool         `json:"secure,omitempty" yaml:"secure,omitempty"`
+		HTTPOnly bool         `json:"httpOnly,omitempty" yaml:"httpOnly,omitempty"`
+		SameSite SameSiteType `json:"sameSite,omitempty" yaml:"sameSite,omitempty"`
+	} `json:"cookie,omitempty" yaml:"cookie,omitempty"`
 }
 
 type RecoverConfig struct {
@@ -136,12 +136,12 @@ type RecoverConfig struct {
 
 	// Size of the stack to be printed.
 	// Optional. Default value 4KB.
-	StackSize int `json:"stack_size,omitempty" yaml:"stack_size,omitempty"`
+	StackSize int `json:"stackSize,omitempty" yaml:"stackSize,omitempty"`
 
 	// DisableStackAll disables formatting stack traces of all other goroutines
 	// into buffer after the trace for the current goroutine.
 	// Optional. Default value false.
-	DisableStackAll bool `json:"disable_stack_all,omitempty" yaml:"disable_stack_all,omitempty"`
+	DisableStackAll bool `json:"disableStackAll,omitempty" yaml:"disableStackAll,omitempty"`
 }
 
 type BodyLimitConfig struct {
@@ -178,7 +178,7 @@ type GzipConfig struct {
 	//
 	// See also:
 	// https://webmasters.stackexchange.com/questions/31750/what-is-recommended-minimum-object-size-for-gzip-performance-benefits
-	MinLength int `json:"min_length,omitempty" yaml:"min_length,omitempty"`
+	MinLength int `json:"minLength,omitempty" yaml:"minLength,omitempty"`
 }
 
 func (cfg *GzipConfig) InitDefaults() {
@@ -194,12 +194,12 @@ type SecureConfig struct {
 	// XSSProtection provides protection against cross-site scripting attack (XSS)
 	// by setting the `X-XSS-Protection` header.
 	// Optional. Default value "1; mode=block".
-	XSSProtection string `json:"xss_protection,omitempty" yaml:"xss_protection,omitempty"`
+	XSSProtection string `json:"xssProtection,omitempty" yaml:"xssProtection,omitempty"`
 
 	// ContentTypeNosniff provides protection against overriding Content-Type
 	// header by setting the `X-Content-Type-Options` header.
 	// Optional. Default value "nosniff".
-	ContentTypeNosniff string `json:"content_type_nosniff,omitempty" yaml:"content_type_nosniff,omitempty"`
+	ContentTypeNosniff string `json:"contentTypeNosniff,omitempty" yaml:"contentTypeNosniff,omitempty"`
 
 	// XFrameOptions can be used to indicate whether or not a browser should
 	// be allowed to render a page in a <frame>, <iframe> or <object> .
@@ -211,45 +211,45 @@ type SecureConfig struct {
 	// - "SAMEORIGIN" - The page can only be displayed in a frame on the same origin as the page itself.
 	// - "DENY" - The page cannot be displayed in a frame, regardless of the site attempting to do so.
 	// - "ALLOW-FROM uri" - The page can only be displayed in a frame on the specified origin.
-	XFrameOptions string `json:"x_frame_options,omitempty" yaml:"x_frame_options,omitempty"`
+	XFrameOptions string `json:"xFrameOptions,omitempty" yaml:"xFrameOptions,omitempty"`
 
 	// HSTSMaxAge sets the `Strict-Transport-Security` header to indicate how
 	// long (in seconds) browsers should remember that this site is only to
 	// be accessed using HTTPS. This reduces your exposure to some SSL-stripping
 	// man-in-the-middle (MITM) attacks.
 	// Optional. Default value 0.
-	HSTSMaxAge int `json:"hsts_max_age,omitempty" yaml:"hsts_max_age,omitempty"`
+	HSTSMaxAge int `json:"hstsMaxAge,omitempty" yaml:"hstsMaxAge,omitempty"`
 
 	// HSTSExcludeSubdomains won't include subdomains tag in the `Strict Transport Security`
 	// header, excluding all subdomains from security policy. It has no effect
 	// unless HSTSMaxAge is set to a non-zero value.
 	// Optional. Default value false.
-	HSTSExcludeSubdomains bool `json:"hsts_exclude_subdomains,omitempty" yaml:"hsts_exclude_subdomains,omitempty"`
+	HSTSExcludeSubdomains bool `json:"hstsExcludeSubdomains,omitempty" yaml:"hstsExcludeSubdomains,omitempty"`
 
 	// ContentSecurityPolicy sets the `Content-Security-Policy` header providing
 	// security against cross-site scripting (XSS), clickjacking and other code
 	// injection attacks resulting from execution of malicious content in the
 	// trusted web page context.
 	// Optional. Default value "".
-	ContentSecurityPolicy string `json:"content_security_policy,omitempty" yaml:"content_security_policy,omitempty"`
+	ContentSecurityPolicy string `json:"contentSecurityPolicy,omitempty" yaml:"contentSecurityPolicy,omitempty"`
 
 	// CSPReportOnly would use the `Content-Security-Policy-Report-Only` header instead
 	// of the `Content-Security-Policy` header. This allows iterative updates of the
 	// content security policy by only reporting the violations that would
 	// have occurred instead of blocking the resource.
 	// Optional. Default value false.
-	CSPReportOnly bool `json:"csp_report_only,omitempty" yaml:"csp_report_only,omitempty"`
+	CSPReportOnly bool `json:"cspReportOnly,omitempty" yaml:"cspReportOnly,omitempty"`
 
 	// HSTSPreloadEnabled will add the preload tag in the `Strict Transport Security`
 	// header, which enables the domain to be included in the HSTS preload list
 	// maintained by Chrome (and used by Firefox and Safari): https://hstspreload.org/
 	// Optional.  Default value false.
-	HSTSPreloadEnabled bool `json:"hsts_preload_enabled,omitempty" yaml:"hsts_preload_enabled,omitempty"`
+	HSTSPreloadEnabled bool `json:"hstsPreloadEnabled,omitempty" yaml:"hstsPreloadEnabled,omitempty"`
 
 	// ReferrerPolicy sets the `Referrer-Policy` header providing security against
 	// leaking potentially sensitive request paths to third parties.
 	// Optional. Default value "".
-	ReferrerPolicy string `json:"referrer_policy,omitempty" yaml:"referrer_policy,omitempty"`
+	ReferrerPolicy string `json:"referrerPolicy,omitempty" yaml:"referrerPolicy,omitempty"`
 }
 
 func (cfg *SecureConfig) InitDefaults() {
@@ -280,7 +280,7 @@ type CORSConfig struct {
 	// Optional. Default value []string{"*"}.
 	//
 	// See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
-	AllowOrigins []string `json:"allow_origins,omitempty" yaml:"allow_origins,omitempty"`
+	AllowOrigins []string `json:"allowOrigins,omitempty" yaml:"allowOrigins,omitempty"`
 
 	// AllowOriginFunc is a custom function to validate the origin. It takes the
 	// origin as an argument and returns true if allowed or false otherwise. If
@@ -304,7 +304,7 @@ type CORSConfig struct {
 	// from `Allow` header that echo.Router set into context.
 	//
 	// See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
-	AllowMethods []string `json:"allow_methods,omitempty" yaml:"allow_methods,omitempty"`
+	AllowMethods []string `json:"allowMethods,omitempty" yaml:"allowMethods,omitempty"`
 
 	// AllowHeaders determines the value of the Access-Control-Allow-Headers
 	// response header.  This header is used in response to a preflight request to
@@ -313,7 +313,7 @@ type CORSConfig struct {
 	// Optional. Default value []string{}.
 	//
 	// See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
-	AllowHeaders []string `json:"allow_headers,omitempty" yaml:"allow_headers,omitempty"`
+	AllowHeaders []string `json:"allowHeaders,omitempty" yaml:"allowHeaders,omitempty"`
 
 	// AllowCredentials determines the value of the
 	// Access-Control-Allow-Credentials response header.  This header indicates
@@ -330,7 +330,7 @@ type CORSConfig struct {
 	// https://blog.portswigger.net/2016/10/exploiting-cors-misconfigurations-for.html
 	//
 	// See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
-	AllowCredentials bool `json:"allow_credentials,omitempty" yaml:"allow_credentials,omitempty"`
+	AllowCredentials bool `json:"allowCredentials,omitempty" yaml:"allowCredentials,omitempty"`
 
 	// UnsafeWildcardOriginWithAllowCredentials UNSAFE/INSECURE: allows wildcard '*' origin to be used with AllowCredentials
 	// flag. In that case we consider any origin allowed and send it back to the client with `Access-Control-Allow-Origin` header.
@@ -339,7 +339,7 @@ type CORSConfig struct {
 	// attacks. See: https://github.com/labstack/echo/issues/2400 for discussion on the subject.
 	//
 	// Optional. Default value is false.
-	UnsafeWildcardOriginWithAllowCredentials bool `json:"unsafe_wildcard_origin_with_allow_credentials,omitempty" yaml:"unsafe_wildcard_origin_with_allow_credentials,omitempty"`
+	UnsafeWildcardOriginWithAllowCredentials bool `json:"unsafeWildcardOriginWithAllowCredentials,omitempty" yaml:"unsafeWildcardOriginWithAllowCredentials,omitempty"`
 
 	// ExposeHeaders determines the value of Access-Control-Expose-Headers, which
 	// defines a list of headers that clients are allowed to access.
@@ -347,7 +347,7 @@ type CORSConfig struct {
 	// Optional. Default value []string{}, in which case the header is not set.
 	//
 	// See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Header
-	ExposeHeaders []string `json:"expose_headers,omitempty" yaml:"expose_headers,omitempty"`
+	ExposeHeaders []string `json:"exposeHeaders,omitempty" yaml:"exposeHeaders,omitempty"`
 
 	// MaxAge determines the value of the Access-Control-Max-Age response header.
 	// This header indicates how long (in seconds) the results of a preflight
@@ -357,7 +357,7 @@ type CORSConfig struct {
 	// Optional. Default value 0 - meaning header is not sent.
 	//
 	// See also: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
-	MaxAge int `json:"max_age,omitempty" yaml:"max_age,omitempty"`
+	MaxAge int `json:"maxAge,omitempty" yaml:"maxAge,omitempty"`
 }
 
 type CSRFConfig struct {
@@ -368,7 +368,7 @@ type CSRFConfig struct {
 	ErrorHandler middleware.CSRFErrorHandler `json:"-" yaml:"-"`
 
 	// TokenLength is the length of the generated token.
-	TokenLength uint8 `json:"token_length,omitempty" yaml:"token_length,omitempty"`
+	TokenLength uint8 `json:"tokenLength,omitempty" yaml:"tokenLength,omitempty"`
 	// Optional. Default value 32.
 
 	// TokenLookup is a string in the form of "<source>:<name>" or "<source>:<name>,<source>:<name>" that is used
@@ -380,43 +380,43 @@ type CSRFConfig struct {
 	// - "form:<name>"
 	// Multiple sources example:
 	// - "header:X-CSRF-Token,query:csrf"
-	TokenLookup string `json:"token_lookup,omitempty" yaml:"token_lookup,omitempty"`
+	TokenLookup string `json:"tokenLookup,omitempty" yaml:"tokenLookup,omitempty"`
 
 	// Context key to store generated CSRF token into context.
 	// Optional. Default value "csrf".
-	ContextKey string `json:"context_key,omitempty" yaml:"context_key,omitempty"`
+	ContextKey string `json:"contextKey,omitempty" yaml:"contextKey,omitempty"`
 
 	Cookie struct {
-		Name     string        `json:"name" yaml:"name"`
-		Domain   string        `json:"domain" yaml:"domain"`
-		Path     string        `json:"path" yaml:"path"`
-		MaxAge   time.Duration `json:"max_age,omitempty" yaml:"max_age,omitempty"`
-		Secure   bool          `json:"secure" yaml:"secure"`
-		HTTPOnly bool          `json:"http_only" yaml:"http_only"`
-		SameSite SameSiteType  `json:"same_site" yaml:"same_site"`
+		Name     string        `json:"name,omitempty" yaml:"name,omitempty"`
+		Domain   string        `json:"domain,omitempty" yaml:"domain,omitempty"`
+		Path     string        `json:"path,omitempty" yaml:"path,omitempty"`
+		MaxAge   time.Duration `json:"maxAge,omitempty" yaml:"maxAge,omitempty"`
+		Secure   bool          `json:"secure,omitempty" yaml:"secure,omitempty"`
+		HTTPOnly bool          `json:"httpOnly,omitempty" yaml:"httpOnly,omitempty"`
+		SameSite SameSiteType  `json:"sameSite,omitempty" yaml:"sameSite,omitempty"`
 	} `json:"cookie" yaml:"cookie"`
 }
 
 type RequestLoggerConfig struct {
 	Skipper              middleware.Skipper             `json:"-" yaml:"-"`
 	AdditionalFieldsFunc func(echo.Context) []zap.Field `json:"-" yaml:"-"`
-	HandleError          bool                           `json:"handle_error,omitempty" yaml:"handle_error,omitempty"`
+	HandleError          bool                           `json:"handleError,omitempty" yaml:"handleError,omitempty"`
 	LogLatency           bool                           `json:"latency,omitempty" yaml:"latency,omitempty"`
 	LogProtocol          bool                           `json:"protocol,omitempty" yaml:"protocol,omitempty"`
-	LogRemoteIP          bool                           `json:"remote_ip,omitempty" yaml:"remote_ip,omitempty"`
+	LogRemoteIP          bool                           `json:"remoteIP,omitempty" yaml:"remoteIP,omitempty"`
 	LogHost              bool                           `json:"host,omitempty" yaml:"host,omitempty"`
 	LogMethod            bool                           `json:"method,omitempty" yaml:"method,omitempty"`
 	LogURI               bool                           `json:"uri,omitempty" yaml:"uri,omitempty"`
-	LogURIPath           bool                           `json:"uri_path,omitempty" yaml:"uri_path,omitempty"`
-	LogRoutePath         bool                           `json:"route_path,omitempty" yaml:"route_path,omitempty"`
-	LogRequestID         bool                           `json:"request_id,omitempty" yaml:"request_id,omitempty"`
+	LogURIPath           bool                           `json:"uriPath,omitempty" yaml:"uriPath,omitempty"`
+	LogRoutePath         bool                           `json:"routePath,omitempty" yaml:"routePath,omitempty"`
+	LogRequestID         bool                           `json:"requestID,omitempty" yaml:"requestID,omitempty"`
 	LogReferer           bool                           `json:"referer,omitempty" yaml:"referer,omitempty"`
-	LogUserAgent         bool                           `json:"user_agent,omitempty" yaml:"user_agent,omitempty"`
+	LogUserAgent         bool                           `json:"userAgent,omitempty" yaml:"userAgent,omitempty"`
 	LogStatus            bool                           `json:"status,omitempty" yaml:"status,omitempty"`
 	LogError             bool                           `json:"error,omitempty" yaml:"error,omitempty"`
-	LogContentLength     bool                           `json:"content_length,omitempty" yaml:"content_length,omitempty"`
-	LogResponseSize      bool                           `json:"response_size,omitempty" yaml:"response_size,omitempty"`
+	LogContentLength     bool                           `json:"contentLength,omitempty" yaml:"contentLength,omitempty"`
+	LogResponseSize      bool                           `json:"responseSize,omitempty" yaml:"responseSize,omitempty"`
 	LogHeaders           []string                       `json:"headers,omitempty" yaml:"headers,omitempty"`
-	LogQueryParams       []string                       `json:"query_params,omitempty" yaml:"query_params,omitempty"`
-	LogFormValues        []string                       `json:"form_values,omitempty" yaml:"form_values,omitempty"`
+	LogQueryParams       []string                       `json:"queryParams,omitempty" yaml:"queryParams,omitempty"`
+	LogFormValues        []string                       `json:"formValues,omitempty" yaml:"formValues,omitempty"`
 }
