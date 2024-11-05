@@ -1,7 +1,7 @@
 github.com/alexedwards/scs/v2 v2.8.0 h1:h31yUYoycPuL0zt14c0gd+oqxfRwIj6SOjHdKRZxhEw=
 github.com/alexedwards/scs/v2 v2.8.0/go.mod h1:ToaROZxyKukJKT/xLcVQAChi5k6+Pn1Gvmdl7h3RRj8=
-github.com/danielgtaylor/huma/v2 v2.24.0 h1:Ihq9yPPC3mFCh0vtLSESXJbKRWtEmtBT6H4780aDL+g=
-github.com/danielgtaylor/huma/v2 v2.24.0/go.mod h1:NbSFXRoOMh3BVmiLJQ9EbUpnPas7D9BeOxF/pZBAGa0=
+github.com/danielgtaylor/huma/v2 v2.25.0 h1:8q/tZLozDs2oFPUHS1xaFVa1mlNYBXV8UbmSQUQeAXo=
+github.com/danielgtaylor/huma/v2 v2.25.0/go.mod h1:NbSFXRoOMh3BVmiLJQ9EbUpnPas7D9BeOxF/pZBAGa0=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-chi/chi/v5 v5.1.0 h1:acVI1TYaD+hhedDJ3r54HyA6sExp3HfXq7QWEEY/xMw=

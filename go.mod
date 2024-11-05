@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	github.com/alexedwards/scs/v2 v2.8.0
-	github.com/danielgtaylor/huma/v2 v2.24.0
+	github.com/danielgtaylor/huma/v2 v2.25.0
 	github.com/google/uuid v1.6.0
 	github.com/gowool/cr v0.0.1
 	github.com/labstack/echo/v4 v4.12.0
