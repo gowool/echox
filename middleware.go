@@ -78,7 +78,7 @@ func RecoverMiddleware(cfg RecoverConfig, logger *zap.Logger) Middleware {
 }
 
 func BodyLimitMiddleware(cfg BodyLimitConfig) Middleware {
-	return NewMiddleware("body_limit", middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{
+	return NewMiddleware("body-limit", middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{
 		Skipper: cfg.Skipper,
 		Limit:   cfg.Limit,
 	}))
@@ -97,7 +97,7 @@ func DecompressMiddleware() Middleware {
 }
 
 func RequestIDMiddleware() Middleware {
-	return NewMiddleware("request_id", middleware.RequestIDWithConfig(middleware.RequestIDConfig{
+	return NewMiddleware("request-id", middleware.RequestIDWithConfig(middleware.RequestIDConfig{
 		Generator: uuid.NewString,
 	}))
 }
@@ -233,7 +233,7 @@ func SessionMiddleware(cfg SessionConfig, sessionManager *scs.SessionManager) Mi
 }
 
 func BasicAuthMiddleware(validator middleware.BasicAuthValidator) Middleware {
-	return NewMiddleware("basic_auth", middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
+	return NewMiddleware("basic-auth", middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
 		Skipper: func(c echo.Context) bool {
 			h := c.Request().Header.Get(echo.HeaderAuthorization)
 			return !strings.HasPrefix(strings.ToLower(h), "basic ")
@@ -243,7 +243,7 @@ func BasicAuthMiddleware(validator middleware.BasicAuthValidator) Middleware {
 }
 
 func BearerAuthMiddleware(validator middleware.KeyAuthValidator) Middleware {
-	return NewMiddleware("bearer_auth", middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+	return NewMiddleware("bearer-auth", middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
 		Skipper: func(c echo.Context) bool {
 			h := c.Request().Header.Get(echo.HeaderAuthorization)
 			return !strings.HasPrefix(strings.ToLower(h), "bearer ")
