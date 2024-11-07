@@ -78,6 +78,8 @@ func RecoverMiddleware(cfg RecoverConfig, logger *zap.Logger) Middleware {
 }
 
 func BodyLimitMiddleware(cfg BodyLimitConfig) Middleware {
+	cfg.setDefaults()
+
 	return NewMiddleware("body-limit", middleware.BodyLimitWithConfig(middleware.BodyLimitConfig{
 		Skipper: cfg.Skipper,
 		Limit:   cfg.Limit,
@@ -85,6 +87,8 @@ func BodyLimitMiddleware(cfg BodyLimitConfig) Middleware {
 }
 
 func CompressMiddleware(cfg GzipConfig) Middleware {
+	cfg.setDefaults()
+
 	return NewMiddleware("compress", middleware.GzipWithConfig(middleware.GzipConfig{
 		Skipper:   cfg.Skipper,
 		Level:     cfg.Level,
@@ -162,6 +166,8 @@ func LoggerMiddleware(cfg RequestLoggerConfig, logger *zap.Logger) Middleware {
 }
 
 func SecureMiddleware(cfg SecureConfig) Middleware {
+	cfg.setDefaults()
+
 	return NewMiddleware("secure", middleware.SecureWithConfig(middleware.SecureConfig{
 		Skipper:               cfg.Skipper,
 		XSSProtection:         cfg.XSSProtection,

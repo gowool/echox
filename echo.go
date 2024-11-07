@@ -114,6 +114,7 @@ func NewEcho(params EchoParams) *echo.Echo {
 			if !cfgAPI.Enabled {
 				continue
 			}
+			cfgAPI.setDefaults()
 
 			humaConfig := huma.DefaultConfig("", "")
 			humaConfig.Servers = []*huma.Server{{URL: cfg.Path + cfgAPI.Path}}

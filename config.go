@@ -29,12 +29,6 @@ type MiddlewaresConfig struct {
 	Logger    RequestLoggerConfig `json:"logger,omitempty" yaml:"logger,omitempty"`
 }
 
-func (cfg *MiddlewaresConfig) InitDefaults() {
-	cfg.BodyLimit.InitDefaults()
-	cfg.Compress.InitDefaults()
-	cfg.Secure.InitDefaults()
-}
-
 type APIConfig struct {
 	Enabled     bool            `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 	Path        string          `json:"path,omitempty" yaml:"path,omitempty"`
@@ -46,7 +40,7 @@ type APIConfig struct {
 	Components  huma.Components `json:"components,omitempty" yaml:"components,omitempty"`
 }
 
-func (cfg *APIConfig) InitDefaults() {
+func (cfg *APIConfig) setDefaults() {
 	if cfg.OpenAPIPath == "" {
 		cfg.OpenAPIPath = "/openapi"
 	}
@@ -63,13 +57,6 @@ type AreaConfig struct {
 	API         map[string]APIConfig `json:"api,omitempty" yaml:"api,omitempty"`
 }
 
-func (cfg *AreaConfig) InitDefaults() {
-	for key, value := range cfg.API {
-		value.InitDefaults()
-		cfg.API[key] = value
-	}
-}
-
 type RoleHierarchyConfig struct {
 	Role     string   `json:"role,omitempty" yaml:"role,omitempty"`
 	Parents  []string `json:"parents,omitempty" yaml:"parents,omitempty"`
@@ -80,14 +67,6 @@ type Config struct {
 	Security    rbac.Config           `json:"security,omitempty" yaml:"security,omitempty"`
 	Middlewares MiddlewaresConfig     `json:"middlewares,omitempty" yaml:"middlewares,omitempty"`
 	Areas       map[string]AreaConfig `json:"areas,omitempty" yaml:"areas,omitempty"`
-}
-
-func (cfg *Config) InitDefaults() {
-	cfg.Middlewares.InitDefaults()
-	for key, value := range cfg.Areas {
-		value.InitDefaults()
-		cfg.Areas[key] = value
-	}
 }
 
 type SameSiteType string
@@ -153,7 +132,7 @@ type BodyLimitConfig struct {
 	Limit string `json:"limit,omitempty" yaml:"limit,omitempty"`
 }
 
-func (cfg *BodyLimitConfig) InitDefaults() {
+func (cfg *BodyLimitConfig) setDefaults() {
 	if cfg.Limit == "" {
 		cfg.Limit = "4KB"
 	}
@@ -181,7 +160,7 @@ type GzipConfig struct {
 	MinLength int `json:"minLength,omitempty" yaml:"minLength,omitempty"`
 }
 
-func (cfg *GzipConfig) InitDefaults() {
+func (cfg *GzipConfig) setDefaults() {
 	if cfg.MinLength <= 0 {
 		cfg.MinLength = 1024
 	}
@@ -252,7 +231,7 @@ type SecureConfig struct {
 	ReferrerPolicy string `json:"referrerPolicy,omitempty" yaml:"referrerPolicy,omitempty"`
 }
 
-func (cfg *SecureConfig) InitDefaults() {
+func (cfg *SecureConfig) setDefaults() {
 	if cfg.XSSProtection == "" {
 		cfg.XSSProtection = middleware.DefaultSecureConfig.XSSProtection
 	}
