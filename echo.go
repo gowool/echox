@@ -73,19 +73,19 @@ func NewEcho(params EchoParams) *echo.Echo {
 		apiHandlers[key] = append(apiHandlers[key], apiHandler)
 	}
 
-	for _, name := range params.Config.Middlewares.Router.Before {
+	for _, name := range params.Config.Router.Middlewares.Before {
 		if middleware, ok := middlewares[name]; ok {
 			e.Pre(middleware)
 		}
 	}
 
-	for _, name := range params.Config.Middlewares.Router.After {
+	for _, name := range params.Config.Router.Middlewares.After {
 		if middleware, ok := middlewares[name]; ok {
 			e.Use(middleware)
 		}
 	}
 
-	for area, cfg := range params.Config.Areas {
+	for area, cfg := range params.Config.Router.Areas {
 		if !cfg.Enabled {
 			continue
 		}

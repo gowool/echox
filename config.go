@@ -15,10 +15,6 @@ import (
 
 type MiddlewaresConfig struct {
 	fx.Out
-	Router struct {
-		Before []string `json:"before,omitempty" yaml:"before,omitempty"`
-		After  []string `json:"after,omitempty" yaml:"after,omitempty"`
-	} `json:"router,omitempty" yaml:"router,omitempty"`
 	Recover   RecoverConfig       `json:"recover,omitempty" yaml:"recover,omitempty"`
 	BodyLimit BodyLimitConfig     `json:"bodyLimit,omitempty" yaml:"bodyLimit,omitempty"`
 	Compress  GzipConfig          `json:"compress,omitempty" yaml:"compress,omitempty"`
@@ -63,10 +59,18 @@ type RoleHierarchyConfig struct {
 	Children []string `json:"children,omitempty" yaml:"children,omitempty"`
 }
 
+type RouterConfig struct {
+	Middlewares struct {
+		Before []string `json:"before,omitempty" yaml:"before,omitempty"`
+		After  []string `json:"after,omitempty" yaml:"after,omitempty"`
+	} `json:"middlewares,omitempty" yaml:"middlewares,omitempty"`
+	Areas map[string]AreaConfig `json:"areas,omitempty" yaml:"areas,omitempty"`
+}
+
 type Config struct {
-	Security    rbac.Config           `json:"security,omitempty" yaml:"security,omitempty"`
-	Middlewares MiddlewaresConfig     `json:"middlewares,omitempty" yaml:"middlewares,omitempty"`
-	Areas       map[string]AreaConfig `json:"areas,omitempty" yaml:"areas,omitempty"`
+	Security    rbac.Config       `json:"security,omitempty" yaml:"security,omitempty"`
+	Middlewares MiddlewaresConfig `json:"middlewares,omitempty" yaml:"middlewares,omitempty"`
+	Router      RouterConfig      `json:"router,omitempty" yaml:"router,omitempty"`
 }
 
 type SameSiteType string
