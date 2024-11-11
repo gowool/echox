@@ -225,7 +225,7 @@ func SessionMiddleware(cfg SessionConfig, sessionManager *scs.SessionManager) Mi
 			}
 
 			sessionManager.ErrorFunc = func(_ http.ResponseWriter, _ *http.Request, err1 error) {
-				err = errors.Join(err, err1)
+				err = err1
 			}
 
 			sessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
