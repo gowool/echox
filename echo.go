@@ -24,7 +24,7 @@ func CtxArea(ctx context.Context) string {
 
 type EchoParams struct {
 	fx.In
-	Config         Config
+	Config         RouterConfig
 	ErrorHandler   echo.HTTPErrorHandler
 	Renderer       echo.Renderer
 	Validator      echo.Validator
@@ -74,19 +74,19 @@ func NewEcho(params EchoParams) *echo.Echo {
 		apiHandlers[key] = append(apiHandlers[key], apiHandler)
 	}
 
-	for _, name := range params.Config.Router.Middlewares.Before {
+	for _, name := range params.Config.Middlewares.Before {
 		if middleware, ok := middlewares[name]; ok {
 			e.Pre(middleware)
 		}
 	}
 
-	for _, name := range params.Config.Router.Middlewares.After {
+	for _, name := range params.Config.Middlewares.After {
 		if middleware, ok := middlewares[name]; ok {
 			e.Use(middleware)
 		}
 	}
 
-	for area, cfg := range params.Config.Router.Areas {
+	for area, cfg := range params.Config.Areas {
 		if !cfg.Enabled {
 			continue
 		}

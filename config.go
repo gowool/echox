@@ -7,20 +7,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
-
-type MiddlewaresConfig struct {
-	fx.Out
-	Recover   RecoverConfig       `json:"recover,omitempty" yaml:"recover,omitempty"`
-	BodyLimit BodyLimitConfig     `json:"bodyLimit,omitempty" yaml:"bodyLimit,omitempty"`
-	Compress  GzipConfig          `json:"compress,omitempty" yaml:"compress,omitempty"`
-	Secure    SecureConfig        `json:"secure,omitempty" yaml:"secure,omitempty"`
-	CORS      CORSConfig          `json:"cors,omitempty" yaml:"cors,omitempty"`
-	CSRF      CSRFConfig          `json:"csrf,omitempty" yaml:"csrf,omitempty"`
-	Logger    RequestLoggerConfig `json:"logger,omitempty" yaml:"logger,omitempty"`
-}
 
 type APIConfig struct {
 	Enabled     bool            `json:"enabled,omitempty" yaml:"enabled,omitempty"`
@@ -62,11 +50,6 @@ type RouterConfig struct {
 		After  []string `json:"after,omitempty" yaml:"after,omitempty"`
 	} `json:"middlewares,omitempty" yaml:"middlewares,omitempty"`
 	Areas map[string]AreaConfig `json:"areas,omitempty" yaml:"areas,omitempty"`
-}
-
-type Config struct {
-	Middlewares MiddlewaresConfig `json:"middlewares,omitempty" yaml:"middlewares,omitempty"`
-	Router      RouterConfig      `json:"router,omitempty" yaml:"router,omitempty"`
 }
 
 type SameSiteType string
