@@ -9,8 +9,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
-
-	"github.com/gowool/echox/rbac"
 )
 
 type MiddlewaresConfig struct {
@@ -21,7 +19,6 @@ type MiddlewaresConfig struct {
 	Secure    SecureConfig        `json:"secure,omitempty" yaml:"secure,omitempty"`
 	CORS      CORSConfig          `json:"cors,omitempty" yaml:"cors,omitempty"`
 	CSRF      CSRFConfig          `json:"csrf,omitempty" yaml:"csrf,omitempty"`
-	Session   SessionConfig       `json:"session,omitempty" yaml:"session,omitempty"`
 	Logger    RequestLoggerConfig `json:"logger,omitempty" yaml:"logger,omitempty"`
 }
 
@@ -68,7 +65,6 @@ type RouterConfig struct {
 }
 
 type Config struct {
-	Security    rbac.Config       `json:"security,omitempty" yaml:"security,omitempty"`
 	Middlewares MiddlewaresConfig `json:"middlewares,omitempty" yaml:"middlewares,omitempty"`
 	Router      RouterConfig      `json:"router,omitempty" yaml:"router,omitempty"`
 }
@@ -95,22 +91,6 @@ func (s SameSiteType) HTTP() http.SameSite {
 	default:
 		panic("invalid same site")
 	}
-}
-
-type SessionConfig struct {
-	Skipper         middleware.Skipper `json:"-" yaml:"-"`
-	CleanupInterval time.Duration      `json:"cleanupInterval,omitempty" yaml:"cleanupInterval,omitempty"`
-	IdleTimeout     time.Duration      `json:"idleTimeout,omitempty" yaml:"idleTimeout,omitempty"`
-	Lifetime        time.Duration      `json:"lifetime,omitempty" yaml:"lifetime,omitempty"`
-	Cookie          struct {
-		Name     string       `json:"name,omitempty" yaml:"name,omitempty"`
-		Domain   string       `json:"domain,omitempty" yaml:"domain,omitempty"`
-		Path     string       `json:"path,omitempty" yaml:"path,omitempty"`
-		Persist  bool         `json:"persist,omitempty" yaml:"persist,omitempty"`
-		Secure   bool         `json:"secure,omitempty" yaml:"secure,omitempty"`
-		HTTPOnly bool         `json:"httpOnly,omitempty" yaml:"httpOnly,omitempty"`
-		SameSite SameSiteType `json:"sameSite,omitempty" yaml:"sameSite,omitempty"`
-	} `json:"cookie,omitempty" yaml:"cookie,omitempty"`
 }
 
 type RecoverConfig struct {

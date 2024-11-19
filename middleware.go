@@ -2,20 +2,14 @@ package echox
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
-	"sync"
 
-	"github.com/alexedwards/scs/v2"
-	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
-
-	"github.com/gowool/echox/rbac"
 )
 
 type Middleware struct {
@@ -39,29 +33,6 @@ func AsMiddleware(middleware any) any {
 
 func AsMiddlewareFunc(name string, middleware echo.MiddlewareFunc) any {
 	return AsMiddleware(NewMiddleware(name, middleware))
-}
-
-type APIMiddleware struct {
-	Name       string
-	Middleware func(huma.API) func(huma.Context, func(huma.Context))
-}
-
-func NewAPIMiddleware(name string, middleware func(huma.API) func(huma.Context, func(huma.Context))) APIMiddleware {
-	return APIMiddleware{
-		Name:       name,
-		Middleware: middleware,
-	}
-}
-
-func AsAPIMiddleware(middleware any) any {
-	return fx.Annotate(
-		middleware,
-		fx.ResultTags(`group:"api-middleware"`),
-	)
-}
-
-func AsAPIMiddlewareFunc(name string, middleware func(huma.API) func(ctx huma.Context, next func(huma.Context))) any {
-	return AsAPIMiddleware(NewAPIMiddleware(name, middleware))
 }
 
 func RecoverMiddleware(cfg RecoverConfig, logger *zap.Logger) Middleware {
@@ -213,31 +184,6 @@ func CSRFMiddleware(cfg CSRFConfig) Middleware {
 	}))
 }
 
-func SessionMiddleware(cfg SessionConfig, sessionManager *scs.SessionManager) Middleware {
-	if cfg.Skipper == nil {
-		cfg.Skipper = middleware.DefaultSkipper
-	}
-
-	return NewMiddleware("session", func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) (err error) {
-			if cfg.Skipper(c) {
-				return next(c)
-			}
-
-			sessionManager.ErrorFunc = func(_ http.ResponseWriter, _ *http.Request, err1 error) {
-				err = err1
-			}
-
-			sessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				c.SetRequest(r)
-				c.SetResponse(echo.NewResponse(w, c.Echo()))
-				err = next(c)
-			})).ServeHTTP(c.Response(), c.Request())
-			return
-		}
-	})
-}
-
 func BasicAuthMiddleware(validator middleware.BasicAuthValidator) Middleware {
 	return NewMiddleware("basic-auth", middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
 		Skipper: func(c echo.Context) bool {
@@ -258,13 +204,9 @@ func BearerAuthMiddleware(validator middleware.KeyAuthValidator) Middleware {
 	}))
 }
 
-func AuthorizationMiddleware(authorizer Authorizer) Middleware {
-	pool := &sync.Pool{
-		New: func() any {
-			return new(Target)
-		},
-	}
+type Authorizer func(*http.Request) error
 
+func AuthorizationMiddleware(authorizer Authorizer) Middleware {
 	unauthorized := func(c echo.Context, errs ...error) error {
 		h := c.Request().Header.Get(echo.HeaderAuthorization)
 		if strings.HasPrefix(strings.ToLower(h), "basic ") {
@@ -273,122 +215,12 @@ func AuthorizationMiddleware(authorizer Authorizer) Middleware {
 		return echo.ErrUnauthorized.WithInternal(errors.Join(errs...))
 	}
 
-	fn := func(c echo.Context) (err error) {
-		var decision Decision = DecisionDeny
-		defer func() {
-			if decision == DecisionDeny && err == nil {
-				err = ErrDeny
-			}
-		}()
-
-		ctx := c.Request().Context()
-		claims := CtxClaims(ctx)
-		assertions := CtxAssertions(ctx)
-
-		target := pool.Get().(*Target)
-		defer pool.Put(target)
-
-		for _, action := range permissions(c.Request().Method, c.Request().URL.Path) {
-			target.Action = action
-			target.Assertions = assertions
-
-			if decision, err = authorizer.Authorize(ctx, claims, target); decision == DecisionAllow {
-				return nil
-			}
-		}
-		return
-	}
-
 	return NewMiddleware("authorization", func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			if err := fn(c); err != nil {
+			if err := authorizer(c.Request()); err != nil {
 				return unauthorized(c, err)
 			}
 			return next(c)
 		}
 	})
-}
-
-func AuthorizationAPIMiddleware(authorizer Authorizer, logger *zap.Logger) APIMiddleware {
-	pool := &sync.Pool{
-		New: func() any {
-			return new(Target)
-		},
-	}
-
-	return NewAPIMiddleware("authorization", func(api huma.API) func(huma.Context, func(huma.Context)) {
-		unauthorized := func(ctx huma.Context, errs ...error) {
-			status := http.StatusUnauthorized
-			message := http.StatusText(status)
-
-			if strings.HasPrefix(strings.ToLower(ctx.Header(echo.HeaderAuthorization)), "basic ") {
-				ctx.SetHeader(echo.HeaderWWWAuthenticate, "basic realm=Restricted")
-			}
-
-			if err := huma.WriteErr(api, ctx, status, message, errs...); err != nil {
-				logger.Error("huma api: failed to write error", zap.Error(err))
-			}
-		}
-
-		fn := func(c huma.Context) (err error) {
-			var decision Decision = DecisionDeny
-			defer func() {
-				if decision == DecisionDeny && err == nil {
-					err = ErrDeny
-				}
-			}()
-
-			claims := CtxClaims(c.Context())
-			assertions := CtxAssertions(c.Context())
-
-			if o := c.Operation(); o.Metadata != nil {
-				for _, value := range o.Metadata {
-					switch value := value.(type) {
-					case *Target:
-						value.Assertions = append(assertions, value.Assertions...)
-						decision, err = authorizer.Authorize(c.Context(), claims, value)
-						return
-					case rbac.Assertion:
-						assertions = append(assertions, value)
-					case []rbac.Assertion:
-						assertions = append(assertions, value...)
-					}
-				}
-			}
-
-			target := pool.Get().(*Target)
-			defer pool.Put(target)
-
-			for _, action := range permissions(c.Method(), c.URL().Path) {
-				target.Action = action
-				target.Assertions = assertions
-
-				if decision, err = authorizer.Authorize(c.Context(), claims, target); decision == DecisionAllow {
-					return nil
-				}
-			}
-			return
-		}
-
-		return func(ctx huma.Context, next func(huma.Context)) {
-			if err := fn(ctx); err != nil {
-				unauthorized(ctx)
-				logger.Error("huma api: failed to authorize", zap.Error(err))
-				return
-			}
-			next(ctx)
-		}
-	})
-}
-
-func permissions(method, path string) []string {
-	if path == "" {
-		path = "/"
-	}
-	return []string{
-		"*",
-		method,
-		path,
-		fmt.Sprintf("%s %s", method, path),
-	}
 }

@@ -6,7 +6,22 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/fx"
 )
+
+type Handler interface {
+	Area() string
+	Version() string
+	Register(*echo.Echo, huma.API)
+}
+
+func AsHandler(f any) any {
+	return fx.Annotate(
+		f,
+		fx.As(new(Handler)),
+		fx.ResultTags(`group:"api-handler"`),
+	)
+}
 
 type ErrorTransformerFunc func(context.Context, error) error
 

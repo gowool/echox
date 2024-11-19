@@ -9,9 +9,10 @@ import (
 	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/danielgtaylor/huma/v2/adapters/humaecho"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
+
+	"github.com/gowool/echox/api"
 )
 
 type areaKey struct{}
@@ -28,11 +29,11 @@ type EchoParams struct {
 	Renderer       echo.Renderer
 	Validator      echo.Validator
 	IPExtractor    echo.IPExtractor
-	Filesystem     fs.FS           `name:"echo-fs"`
-	Handlers       []Handler       `group:"handler"`
-	Middlewares    []Middleware    `group:"middleware"`
-	APIHandlers    []APIHandler    `group:"api-handler"`
-	APIMiddlewares []APIMiddleware `group:"api-middleware"`
+	Filesystem     fs.FS            `name:"echo-fs"`
+	Handlers       []Handler        `group:"handler"`
+	Middlewares    []Middleware     `group:"middleware"`
+	APIHandlers    []api.Handler    `group:"api-handler"`
+	APIMiddlewares []api.Middleware `group:"api-middleware"`
 }
 
 func NewEcho(params EchoParams) *echo.Echo {
@@ -67,7 +68,7 @@ func NewEcho(params EchoParams) *echo.Echo {
 		handlers[handler.Area()] = append(handlers[handler.Area()], handler)
 	}
 
-	apiHandlers := make(map[string][]APIHandler)
+	apiHandlers := make(map[string][]api.Handler)
 	for _, apiHandler := range params.APIHandlers {
 		key := fmt.Sprintf("%s-%s", apiHandler.Area(), apiHandler.Version())
 		apiHandlers[key] = append(apiHandlers[key], apiHandler)
@@ -125,16 +126,16 @@ func NewEcho(params EchoParams) *echo.Echo {
 			humaConfig.Components = &cfgAPI.Components
 			humaConfig.Components.Schemas = schemas
 
-			api := humaecho.NewWithGroup(e, group.Group(cfgAPI.Path), humaConfig)
+			humaAPI := huma.NewAPI(humaConfig, api.NewAdapter(e, group.Group(cfgAPI.Path)))
 
 			for _, name := range cfgAPI.Middlewares {
 				if mdw, ok := apiMiddlewares[name]; ok {
-					api.UseMiddleware(mdw(api))
+					humaAPI.UseMiddleware(mdw(humaAPI))
 				}
 			}
 
 			for _, h := range apiHandlers[fmt.Sprintf("%s-%s", area, version)] {
-				h.Register(e, api)
+				h.Register(e, humaAPI)
 			}
 		}
 	}
