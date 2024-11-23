@@ -4,6 +4,7 @@ go 1.23.2
 
 require (
 	github.com/danielgtaylor/huma/v2 v2.26.0
+	github.com/expr-lang/expr v1.16.9
 	github.com/google/uuid v1.6.0
 	github.com/gowool/cr v0.0.1
 	github.com/labstack/echo/v4 v4.12.0
