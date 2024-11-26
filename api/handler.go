@@ -42,7 +42,7 @@ type CRUD[
 	UB interface {
 		Decode(context.Context, *M) error
 	},
-	M interface{ GetID() ID },
+	M any,
 	ID any,
 ] struct {
 	Info CRUDInfo
