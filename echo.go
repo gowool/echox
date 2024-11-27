@@ -7,10 +7,13 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"unsafe"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"github.com/gowool/echox/api"
 )
@@ -25,6 +28,7 @@ func CtxArea(ctx context.Context) string {
 type EchoParams struct {
 	fx.In
 	Config         RouterConfig
+	Logger         *zap.Logger
 	ErrorHandler   echo.HTTPErrorHandler
 	Renderer       echo.Renderer
 	Validator      echo.Validator
@@ -41,17 +45,13 @@ func NewEcho(params EchoParams) *echo.Echo {
 	e.Debug = false
 	e.HideBanner = true
 	e.HidePort = true
-	e.Server.Handler = nil
-	e.Server = nil
-	e.TLSServer.Handler = nil
-	e.TLSServer = nil
-	e.StdLogger = nil
-	e.Logger = nil
 	e.Renderer = params.Renderer
 	e.Validator = params.Validator
 	e.IPExtractor = params.IPExtractor
 	e.Filesystem = params.Filesystem
 	e.HTTPErrorHandler = params.ErrorHandler
+	e.StdLogger = zap.NewStdLog(params.Logger)
+	e.Logger.SetOutput(&loggerWriter{echo: e.Logger, zap: params.Logger})
 
 	middlewares := make(map[string]echo.MiddlewareFunc)
 	for _, middleware := range params.Middlewares {
@@ -163,4 +163,26 @@ func IPExtractor() echo.IPExtractor {
 		ra, _, _ := net.SplitHostPort(r.RemoteAddr)
 		return ra
 	}
+}
+
+type loggerWriter struct {
+	echo echo.Logger
+	zap  *zap.Logger
+}
+
+func (w *loggerWriter) Write(p []byte) (n int, err error) {
+	msg := unsafe.String(unsafe.SliceData(p), len(p))
+
+	switch w.echo.Level() {
+	case log.DEBUG:
+		w.zap.Debug(msg, zap.Any("lvl", w.echo.Level()))
+	case log.INFO:
+		w.zap.Info(msg, zap.Any("lvl", w.echo.Level()))
+	case log.WARN:
+		w.zap.Warn(msg, zap.Any("lvl", w.echo.Level()))
+	case log.OFF:
+	default:
+		w.zap.Error(msg, zap.Any("lvl", w.echo.Level()))
+	}
+	return len(p), nil
 }
