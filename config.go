@@ -78,7 +78,7 @@ func (s SameSiteType) HTTP() http.SameSite {
 
 type RecoverConfig struct {
 	// Skipper defines a function to skip middleware.
-	Skipper middleware.Skipper
+	Skipper middleware.Skipper `json:"-" yaml:"-"`
 
 	// Size of the stack to be printed.
 	// Optional. Default value 4KB.
