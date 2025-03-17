@@ -46,9 +46,7 @@ func (h Delete[ID]) Handler(ctx context.Context, in *IDInput[ID]) (*struct{}, er
 }
 
 type IDsInput[ID any] struct {
-	Body struct {
-		IDs []ID `json:"ids" required:"true" minItems:"1" nullable:"false"`
-	}
+	IDs []ID `query:"ids" required:"true" minItems:"1" nullable:"false"`
 }
 
 type DeleteMany[ID any] struct {
@@ -80,6 +78,6 @@ func (h DeleteMany[ID]) Register(_ *echo.Echo, api huma.API) {
 }
 
 func (h DeleteMany[ID]) Handler(ctx context.Context, in *IDsInput[ID]) (*struct{}, error) {
-	err := h.Deleter(ctx, in.Body.IDs...)
+	err := h.Deleter(ctx, in.IDs...)
 	return nil, err
 }
